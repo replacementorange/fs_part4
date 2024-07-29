@@ -1,3 +1,5 @@
+//const _ = require('lodash')
+
 // dummy that returns 1
 const dummy = (blogs) => {
     return 1
@@ -29,6 +31,26 @@ const favoriteBlog = (blogs) => {
     return mostLiked
   }
 
+// receives an array of blogs as a parameter. Function returns the author who has the largest amount of blogs
+// https://lodash.com/docs/
+// https://lodash.com/docs/#groupBy --> by author
+// _.groupBy([6.1, 4.2, 6.3], Math.floor); => { '4': [4.2], '6': [6.1, 6.3] }
+// https://lodash.com/docs/#map --> author & info
+// https://lodash.com/docs/#maxBy --> most blogs
+const mostBlogs = blogs => {
+  // return _(blogs).groupBy('author').map((info, author) => ({author: author, blogs: info.lenght})).maxBy(author => author.blogs)
+    const occur = blogs.reduce((max, blog) => {
+      max[blog.author] = (max[blog.author] || 0 ) + 1
+      return max
+    }, {})
+
+    const most = Object.keys(occur).reduce((a, b) => occur[a] > occur[b]
+      ? { author: a, blogs: occur[a] }
+      : { author: b, blogs: occur[b] }
+    )
+    return most
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog
+    dummy, totalLikes, favoriteBlog, mostBlogs,
   }
