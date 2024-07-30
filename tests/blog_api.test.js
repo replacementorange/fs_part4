@@ -17,15 +17,15 @@ const initialBlogs = [
         likes: 12,
         _id: "66a8d0c6d96d254acfc5909d",
         __v: 0
-      },
-  {
+    },
+    {
     title: "My Blog n 2",
     author: "Me",
     url: "https://www.example2.com",
     likes: 8,
     _id: "66a8d0c6d96d254acfc5909e",
     __v: 0
-  }
+    }
 ]
 
 beforeEach(async () => {
@@ -43,15 +43,22 @@ test.only('blogs are returned as json', async () => {
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
-//blogsRouter.get('/api/blogs'', async (request, response) => { 
-//    const blogs = await Blog.find({})
-//    response.json(blogs)
-//  })
 
 test.only('there are two blogs', async () => {
     const response = await api.get('/api/blogs')
   
     assert.strictEqual(response.body.length, initialBlogs.length)
+  })
+
+test.only('verifies that the unique identifier property of the blog posts is named id', async () => {
+    const response = await api.get('/api/blogs')
+    const result = response.body[0] // id
+    const keys = Object.keys(result) // Returns the names of the enumerable string properties and methods of an object.
+
+    // assert(contents.includes('HTML is easy'))
+    //assert(Object.keys(result.includes('id')))
+    assert(keys.includes('id')) // includes id
+    assert.strictEqual(keys.includes('_id'), false) // includes not _id
   })
 
 after(async () => {
