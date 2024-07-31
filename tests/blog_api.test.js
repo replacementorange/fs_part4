@@ -1,6 +1,7 @@
 const { test, after, beforeEach } = require('node:test')
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
+const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 
@@ -8,31 +9,15 @@ const api = supertest(app)
 
 const assert = require('assert')
 
-// initialize the database before every test with the beforeEach function
-const initialBlogs = [
-    {
-        title: "My Blog",
-        author: "Myself",
-        url: "https://www.example.com",
-        likes: 12,
-        _id: "66a8d0c6d96d254acfc5909d",
-        __v: 0
-    },
-    {
-    title: "My Blog n 2",
-    author: "Me",
-    url: "https://www.example2.com",
-    likes: 8,
-    _id: "66a8d0c6d96d254acfc5909e",
-    __v: 0
-    }
-]
+const initialBlogs = helper.initialBlogs
+const nonExistingId = helper.nonExistingId
+const blogsInDb = helper.blogsInDb
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
+  let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
+  blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
 })
 
@@ -47,7 +32,7 @@ test.only('blogs are returned as json', async () => {
 test.only('there are two blogs', async () => {
     const response = await api.get('/api/blogs')
   
-    assert.strictEqual(response.body.length, initialBlogs.length)
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
   })
 
 test.only('verifies that the unique identifier property of the blog posts is named id', async () => {
@@ -59,6 +44,34 @@ test.only('verifies that the unique identifier property of the blog posts is nam
     //assert(Object.keys(result.includes('id')))
     assert(keys.includes('id')) // includes id
     assert.strictEqual(keys.includes('_id'), false) // includes not _id
+  })
+
+  test.only('POST successfully creates a new blog post', async () => {
+    const newBlog =   {
+      title: "Ekan luokan testit",
+      author: "Roope S. MArtti",
+      url: "http://blog.dirtycode.xd/",
+      likes: 9
+    }
+
+    // https://fullstackopen.com/en/part4/testing_the_backend#more-tests-and-refactoring-the-backend
+    await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    //const response = await api.get('/api/blogs')
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const contents = blogsAtEnd.map(b => b.title) //response.body.map(r => r.title)
+
+    // verify the total number of blogs in the system is increased by one
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+    // verify that the content of the blog post is saved correctly to the database
+    //assert(contents.includes('Ekan luokan testit')) --> turn to contents have something
+    assert(contents.includes(newBlog.title))
   })
 
 after(async () => {

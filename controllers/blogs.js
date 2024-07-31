@@ -8,14 +8,17 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 // Blog post
-blogsRouter.post('/', (request, response) => {
+// 31.7 refactor the operation to use async/await instead of promises
+blogsRouter.post('/', async (request, response) => {
     const blog = new Blog(request.body)
-
-    blog
-      .save()
-      .then(result => {
-        response.status(201).json(result)
-      })
+    
+    //blog
+    //  .save()
+    //  .then(result => {
+    //    response.status(201).json(result)
+    //  })
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog)
 })
 
 module.exports = blogsRouter
