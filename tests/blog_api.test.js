@@ -46,7 +46,7 @@ test.only('verifies that the unique identifier property of the blog posts is nam
     assert.strictEqual(keys.includes('_id'), false) // includes not _id
   })
 
-  test.only('POST successfully creates a new blog post', async () => {
+test.only('POST successfully creates a new blog post', async () => {
     const newBlog =   {
       title: "Ekan luokan testit",
       author: "Roope S. MArtti",
@@ -74,7 +74,7 @@ test.only('verifies that the unique identifier property of the blog posts is nam
     assert(contents.includes(newBlog.title))
   })
 
-  test.only('if the likes property is missing, it will default to the value 0', async () => {
+test.only('if the likes property is missing, it will default to the value 0', async () => {
     const blogZeroLikes =   {
       title: "Suffering and Me",
       author: "Jonh J. Doe",
@@ -92,6 +92,32 @@ test.only('verifies that the unique identifier property of the blog posts is nam
 
     assert.strictEqual(content.likes, 0)
   })
+
+test.only('verify that if the title property is missing from the request data respond 400 Bad Request', async () => {
+  const blogNoTitle =   {
+    author: "Esa I. Ase",
+    url: "http://nothing.happens.xd/",
+    likes: 4
+  }
+
+  await api
+  .post('/api/blogs')
+  .send(blogNoTitle)
+  .expect(400)
+
+})
+
+test.only('verify that if the url property is missing from the request data respond 400 Bad Request', async () => {
+  const blogNoURL =   {
+    author: "Masa P. Kaupunki",
+    title: "Mulla on motii koton",
+  }
+
+  await api
+  .post('/api/blogs')
+  .send(blogNoURL)
+  .expect(400)
+})
 
 after(async () => {
   await mongoose.connection.close()
