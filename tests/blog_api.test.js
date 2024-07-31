@@ -119,19 +119,35 @@ test.only('verify that if the url property is missing from the request data resp
   .expect(400)
 })
 
-  test.only('deleting a single blog post by id', async () => {
-    const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+test.only('deleting a single blog post by id', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
 
-    await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
-      .expect(204)
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
 
-    const blogsAtEnd = await helper.blogsInDb()
+  const blogsAtEnd = await helper.blogsInDb()
 
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
   })
 
+  test.only('updating the information of an individual blog post', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const updateBlog = {
+      likes: 15
+    }
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updateBlog)
+      .expect(200)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd[0].likes, 15)
+  })
 
 after(async () => {
   await mongoose.connection.close()
