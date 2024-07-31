@@ -1,7 +1,7 @@
 const { test, after, beforeEach } = require('node:test')
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
-const helper = require('./test_helper')
+const helper = require('../utils/test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 
@@ -118,6 +118,20 @@ test.only('verify that if the url property is missing from the request data resp
   .send(blogNoURL)
   .expect(400)
 })
+
+  test.only('deleting a single blog post by id', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+  })
+
 
 after(async () => {
   await mongoose.connection.close()

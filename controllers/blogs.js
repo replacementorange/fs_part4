@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router()
+const { response } = require('express')
 const Blog = require('../models/blog')
 
 // Blog route
@@ -24,6 +25,23 @@ blogsRouter.post('/', async (request, response) => {
     //  })
     const savedBlog = await blog.save()
     response.status(201).json(savedBlog)
+})
+
+blogsRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
+  }
+})
+
+// Blog delete (4.13)
+// https://fullstackopen.com/en/part3/node_js_and_express#rest
+// https://mongoosejs.com/docs/api/model.html#Model.findByIdAndDelete()
+blogsRouter.delete('/:id', async (request, response) => {
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
 })
 
 module.exports = blogsRouter
