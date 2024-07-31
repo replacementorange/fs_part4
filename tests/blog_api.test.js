@@ -74,6 +74,25 @@ test.only('verifies that the unique identifier property of the blog posts is nam
     assert(contents.includes(newBlog.title))
   })
 
+  test.only('if the likes property is missing, it will default to the value 0', async () => {
+    const blogZeroLikes =   {
+      title: "Suffering and Me",
+      author: "Jonh J. Doe",
+      url: "http://pain.fullstack.ee"
+    }
+
+    await api
+    .post('/api/blogs')
+    .send(blogZeroLikes)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const content = response.body.find(b => b.title === blogZeroLikes.title)
+
+    assert.strictEqual(content.likes, 0)
+  })
+
 after(async () => {
   await mongoose.connection.close()
 })
