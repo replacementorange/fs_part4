@@ -1,17 +1,13 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, describe, after, beforeEach } = require('node:test')
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
+const app = require('../index')
 const helper = require('../utils/test_helper')
 const supertest = require('supertest')
-const app = require('../app')
 
 const api = supertest(app)
 
 const assert = require('assert')
-
-const initialBlogs = helper.initialBlogs
-const nonExistingId = helper.nonExistingId
-const blogsInDb = helper.blogsInDb
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -22,20 +18,20 @@ beforeEach(async () => {
 })
 
 // npm test -- tests/blog_api.test.js
-test.only('blogs are returned as json', async () => {
+test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
-test.only('there are two blogs', async () => {
+test('there are two blogs', async () => {
     const response = await api.get('/api/blogs')
   
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
   })
 
-test.only('verifies that the unique identifier property of the blog posts is named id', async () => {
+test('verifies that the unique identifier property of the blog posts is named id', async () => {
     const response = await api.get('/api/blogs')
     const result = response.body[0] // id
     const keys = Object.keys(result) // Returns the names of the enumerable string properties and methods of an object.
@@ -46,7 +42,7 @@ test.only('verifies that the unique identifier property of the blog posts is nam
     assert.strictEqual(keys.includes('_id'), false) // includes not _id
   })
 
-test.only('POST successfully creates a new blog post', async () => {
+test('POST successfully creates a new blog post', async () => {
     const newBlog =   {
       title: "Ekan luokan testit",
       author: "Roope S. MArtti",
@@ -74,7 +70,7 @@ test.only('POST successfully creates a new blog post', async () => {
     assert(contents.includes(newBlog.title))
   })
 
-test.only('if the likes property is missing, it will default to the value 0', async () => {
+test('if the likes property is missing, it will default to the value 0', async () => {
     const blogZeroLikes =   {
       title: "Suffering and Me",
       author: "Jonh J. Doe",
@@ -93,7 +89,7 @@ test.only('if the likes property is missing, it will default to the value 0', as
     assert.strictEqual(content.likes, 0)
   })
 
-test.only('verify that if the title property is missing from the request data respond 400 Bad Request', async () => {
+test('verify that if the title property is missing from the request data respond 400 Bad Request', async () => {
   const blogNoTitle =   {
     author: "Esa I. Ase",
     url: "http://nothing.happens.xd/",
@@ -107,7 +103,7 @@ test.only('verify that if the title property is missing from the request data re
 
 })
 
-test.only('verify that if the url property is missing from the request data respond 400 Bad Request', async () => {
+test('verify that if the url property is missing from the request data respond 400 Bad Request', async () => {
   const blogNoURL =   {
     author: "Masa P. Kaupunki",
     title: "Mulla on motii koton",
@@ -119,7 +115,7 @@ test.only('verify that if the url property is missing from the request data resp
   .expect(400)
 })
 
-test.only('deleting a single blog post by id', async () => {
+test('deleting a single blog post by id', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToDelete = blogsAtStart[0]
 
@@ -132,7 +128,7 @@ test.only('deleting a single blog post by id', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
   })
 
-  test.only('updating the information of an individual blog post', async () => {
+  test('updating the information of an individual blog post', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
 
